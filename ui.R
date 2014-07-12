@@ -36,7 +36,7 @@ shinyUI(pageWithSidebar(
         pages then books with deep coverage of those topics. Hardcovered books costs higher 
         then paperbacks and so on."),
       p("Based on books dataset with 481 observations the app builds linear regression model 
-        with ",strong("Price")," as dependent variable and ",strong("Publisher (Russian or Foreign), 
+        with ", strong("Price")," as dependent variable and ",strong("Publisher (Russian or Foreign), 
         Type of cover and Number of pages")," as predictors."),
       p("Because i am in Russia, costs given in rubles (RUR) - our currency."),
       p("Have fun! :)"),
