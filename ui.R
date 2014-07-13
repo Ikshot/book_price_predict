@@ -34,7 +34,7 @@ shinyUI(pageWithSidebar(
               tags$li("quick references on topics have less pages and lower price 
                 then books with deep coverage of those topics;"), 
               tags$li("hardcovered books generally costs higher then paperbacks and so on.")),
-      p("Based on my books dataset with",strong("481"),"observations the app builds linear regression model 
+      p("Based on my books dataset with",strong("480"),"observations the app builds linear regression model 
         with", strong("Price"),"as dependent variable and",strong("Publisher (Russian or Foreign), 
         Type of cover"),"and",strong("Number of pages"),"as predictors."),
       p("Because I am in Russia, I've got initial costs (in my dataset) in rubles ",strong("(RUR)"),"- 
