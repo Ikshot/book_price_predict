@@ -10,7 +10,7 @@ library(shiny)
 books <- read.csv("Books_data.csv",sep=";",header=TRUE,as.is=c("Authors","Title"))
 model=lm(Price~Pages*Cover+Pages*Publisher+Cover*Publisher,data=books)
 
-CreatePlot <- function(pgs,ct,pub)
+CreatePlot <- function(pgs,ct,pub,cur,rate)
 {
     data_to_predict=data.frame(Cover=ct,Pages=pgs,Publisher=pub)
     pred <- predict(model,newdata=data_to_predict,se.fit=TRUE)
@@ -20,29 +20,39 @@ CreatePlot <- function(pgs,ct,pub)
     plot_title=paste(data_to_predict$Publisher,"book with",data_to_predict$Cover,
                      "and",data_to_predict$Pages,"pages",sep=" ")
     
+    
     if (pred.plim[2]>=0) pred_int_lower = pred.plim[2] else pred_int_lower=0
     
-    boxplot(x=c(pred_int_lower,pred.clim[2],pred$fit[1],pred.clim[3],pred.plim[3]),
-            col="orange",main=plot_title,range=0,ylab="Predicted price (RUR)")
+    plot_data=c(pred_int_lower,pred.clim[2],pred$fit[1],pred.clim[3],pred.plim[3])
     
-    c_up_text=paste("Confidence interval upper bound (",round(pred.clim[3],2),"RUR )")
-    text(x=1,y=pred.clim[3]+50,c_up_text,col="orange")
+    text_offset=50
+    if (cur=="USD") 
+    {
+        plot_data=plot_data/rate
+        text_offset=text_offset/rate
+    }
     
-    c_low_text=paste("Confidence interval lower bound (",round(pred.clim[2],2),"RUR )")
-    text(x=1,y=pred.clim[2]-50,c_low_text,col="orange")
+    boxplot(x=plot_data,
+            col="orange",main=plot_title,range=0,ylab=paste("Predicted price (",cur,")"))
+
+    p_low_text=paste("Prediction interval lower bound (",round(plot_data[1],2),cur,")")
+    text(x=1,y=plot_data[1]+text_offset,p_low_text,col="darkgreen")
+
+    c_low_text=paste("Confidence interval lower bound (",round(plot_data[2],2),cur,")")
+    text(x=1,y=plot_data[2]-text_offset,c_low_text,col="orange")
+
+    predicted_text=paste("Predicted price (",round(plot_data[3],2),cur,")")
+    text(x=1,y=plot_data[3]+text_offset,predicted_text)
+
+    c_up_text=paste("Confidence interval upper bound (",round(plot_data[4],2),cur,")")
+    text(x=1,y=plot_data[4]+text_offset,c_up_text,col="orange")
     
-    p_up_text=paste("Prediction interval upper bound (",round(pred.plim[3],2),"RUR )")
-    text(x=1,y=pred.plim[3]-50,p_up_text,col="darkgreen")
-    
-    p_low_text=paste("Prediction interval lower bound (",round(pred_int_lower,2),"RUR )")
-    text(x=1,y=pred_int_lower+50,p_low_text,col="darkgreen")
-    
-    predicted_text=paste("Predicted price (",round(pred$fit[1],2),"RUR )")
-    text(x=1,y=pred$fit[1]+50,predicted_text)
+    p_up_text=paste("Prediction interval upper bound (",round(plot_data[5],2),cur,")")
+    text(x=1,y=plot_data[5]-text_offset,p_up_text,col="darkgreen")
 }
 
 shinyServer(function(input, output) {
     output$booksPlot <- renderPlot({
-        CreatePlot(input$pgs,input$ct,input$pub)
+        CreatePlot(input$pgs,input$ct,input$pub,input$cur,input$rate)
     })
 })
